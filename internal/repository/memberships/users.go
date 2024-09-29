@@ -14,7 +14,7 @@ func (r *repository) GetUser(ctx context.Context, email, username string) (*memb
 
 	var response memberships.UserModel
 
-	err := row.Scan(&response.ID, &response.Email, &response.Password, &response.Username, &response.CreatedAt, &response.UpdatedAt, &response.CreatedBy, &response.UpdateBy)
+	err := row.Scan(&response.ID, &response.Email, &response.Password, &response.Username, &response.CreatedAt, &response.UpdatedAt, &response.CreatedBy, &response.UpdatedBy)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

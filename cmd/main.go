@@ -6,6 +6,7 @@ import (
 	"github.com/Fairuzzzzz/simpleform/internal/configs"
 	"github.com/Fairuzzzzz/simpleform/internal/handler/membership"
 	membershipsRepo "github.com/Fairuzzzzz/simpleform/internal/repository/memberships"
+	membershipsSvc "github.com/Fairuzzzzz/simpleform/internal/service/memberships"
 	"github.com/Fairuzzzzz/simpleform/pkg/internalsql"
 	"github.com/gin-gonic/gin"
 )
@@ -35,9 +36,11 @@ func main() {
 		log.Fatal("Gagal inisasi database", err)
 	}
 
-	_ = membershipsRepo.NewRepository(db)
+	membershipRepo := membershipsRepo.NewRepository(db)
 
-	membershipHandler := membership.NewHandler(r)
+	membershipService := membershipsSvc.NewService(membershipRepo)
+
+	membershipHandler := membership.NewHandler(r, membershipService)
 	membershipHandler.RegisterRoute()
 	r.Run(cfg.Service.Port)
 }
