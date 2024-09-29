@@ -2,4 +2,4 @@ service:
   port: ":9876"
 
 database:
-  dataSourceName: "root:testpassword@tcp(127.0.0.1:3306)/belajar"
+  dataSourceName: "root:testpassword@tcp(127.0.0.1:3306)/belajar?parseTime=true"
