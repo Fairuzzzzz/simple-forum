@@ -29,7 +29,6 @@ func main() {
 	}
 
 	cfg = configs.Get()
-	log.Println("config", cfg)
 
 	db, err := internalsql.Connect(cfg.Database.DataSourceName)
 	if err != nil {
@@ -38,7 +37,7 @@ func main() {
 
 	membershipRepo := membershipsRepo.NewRepository(db)
 
-	membershipService := membershipsSvc.NewService(membershipRepo)
+	membershipService := membershipsSvc.NewService(cfg, membershipRepo)
 
 	membershipHandler := membership.NewHandler(r, membershipService)
 	membershipHandler.RegisterRoute()
