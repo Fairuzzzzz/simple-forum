@@ -5,8 +5,11 @@ import (
 
 	"github.com/Fairuzzzzz/simpleform/internal/configs"
 	"github.com/Fairuzzzzz/simpleform/internal/handler/membership"
+	"github.com/Fairuzzzzz/simpleform/internal/handler/posts"
 	membershipsRepo "github.com/Fairuzzzzz/simpleform/internal/repository/memberships"
+	postRepo "github.com/Fairuzzzzz/simpleform/internal/repository/posts"
 	membershipsSvc "github.com/Fairuzzzzz/simpleform/internal/service/memberships"
+	postSvc "github.com/Fairuzzzzz/simpleform/internal/service/posts"
 	"github.com/Fairuzzzzz/simpleform/pkg/internalsql"
 	"github.com/gin-gonic/gin"
 )
@@ -35,11 +38,21 @@ func main() {
 		log.Fatal("Gagal inisasi database", err)
 	}
 
+	// Middleware default gin
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
 	membershipRepo := membershipsRepo.NewRepository(db)
+	postRepo := postRepo.NewRepository(db)
 
 	membershipService := membershipsSvc.NewService(cfg, membershipRepo)
+	postService := postSvc.NewService(cfg, postRepo)
 
 	membershipHandler := membership.NewHandler(r, membershipService)
 	membershipHandler.RegisterRoute()
+
+	postHandler := posts.NewHandler(r, postService)
+	postHandler.RegisterRoute()
+
 	r.Run(cfg.Service.Port)
 }
