@@ -2,6 +2,7 @@ package posts
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Fairuzzzzz/simpleform/internal/model/posts"
 )
@@ -13,4 +14,41 @@ func (r *repository) CreatePost(ctx context.Context, model posts.PostModel) erro
 		return err
 	}
 	return nil
+}
+
+func (r *repository) GetAllPost(ctx context.Context, limit, offset int) (posts.GetAllPostResponse, error) {
+	query := `SELECT p.id, p.user_id, u.username, p.post_title, p.post_content, p.post_hashtag FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.updated_at DESC LIMIT ? OFFSET ? `
+
+	var response posts.GetAllPostResponse
+	rows, err := r.db.QueryContext(ctx, query, limit, offset)
+	if err != nil {
+		return response, err
+	}
+	defer rows.Close()
+
+	data := make([]posts.Post, 0)
+	for rows.Next() {
+		var (
+			model    posts.PostModel
+			username string
+		)
+		err = rows.Scan(&model.ID, &model.UserID, &username, &model.PostTitle, &model.PostContent, &model.PostHashtags)
+		if err != nil {
+			return response, err
+		}
+		data = append(data, posts.Post{
+			ID:          model.ID,
+			UserID:      model.UserID,
+			Username:    username,
+			PostTitle:   model.PostTitle,
+			PostContent: model.PostContent,
+			PostHashtag: strings.Split(model.PostHashtags, ","),
+		})
+	}
+	response.Data = data
+	response.Pagination = posts.Pagination{
+		Limit:  limit,
+		Offset: offset,
+	}
+	return response, nil
 }
